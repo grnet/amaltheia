@@ -1,0 +1,4 @@
+paramiko
+python-openstackclient
+colorama
+jinja2

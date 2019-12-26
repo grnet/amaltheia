@@ -1,0 +1,28 @@
+## Amaltheia Job
+## Author: Aggelos Kolaitis
+## Description:
+
+## Parameters:
+## - "netbox_site": Site name for NetBox
+
+## Usage 1:
+##  $ amaltheia -s this-file.yaml -v netbox_site=myShinyDC
+
+---
+required:
+- netbox_site
+config:
+  log_level: info                      # debug/info/warning/error/fatal
+strategy:
+  parallel:
+    nparallel: 2
+hosts:
+- netbox:
+    netbox_url: "https://my-netbox-server/api/dcim/devices/?site={{ netbox_site }}&limit=0&status=1"
+    filter_name: worker-..
+    host_name: '{{ host.name|lower }}.domain.ext'
+    host_args:
+      ssh_user: ubuntu
+services: []
+updates:
+- dummy

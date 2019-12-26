@@ -1,0 +1,10 @@
+**.pyc
+**/__pycache__
+pilot.rc
+ssh_id_rsa
+ssh_config
+.tox
+.venv
+venv
+.eggs
+*.egg-info

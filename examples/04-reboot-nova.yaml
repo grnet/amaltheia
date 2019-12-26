@@ -1,0 +1,30 @@
+## Amaltheia Job
+## Author: Aggelos Kolaitis
+## Description: Reboot 3 nova-compute instances. Before re
+
+## Parameters:
+## (none)
+
+## Usage 1:
+##  $ amaltheia -s this-file.yaml
+
+---
+config:
+  log_level: info                      # debug/info/warning/error/fatal
+  ssh_user: nova
+  ssh_id_rsa_file: ./ssh_id_rsa
+strategy:
+  parallel:
+    nparallel: 4
+hosts:
+- static:
+  - nova-compute-1.domain.ext
+  - nova-compute-2.domain.ext
+  - nova-compute-3.domain.ext
+services:
+- nova-compute
+updates:
+- reboot:
+    wait: true
+    wait-timeout: 600
+    wait-check-interval: 20

@@ -1,0 +1,22 @@
+pipeline {
+  // If amaltheia was installed on a specific node only, then uncomment
+  // the line below and use the correct label name so that job is only
+  // ever executed on that node
+
+  // agent {
+  //   label 'YOUR-JENKINS-NODE-WITH-THE-AMALTHEIA-DOCKER-IMAGE'
+  // }
+  stages {
+      stage('Perform system updates with amaltheia') {
+      steps {
+        script {
+          if (autoremove == 'true') {
+            sh 'docker run --rm amaltheia-jenkins-image -s /job.yaml -v filter="${filter}" autoremove=1'
+          } else {
+            sh 'docker run --rm amaltheia-jenkins-image -s /job.yaml -v filter="${filter}"'
+          }
+        }
+      }
+    }
+  }
+}

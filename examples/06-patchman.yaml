@@ -1,0 +1,36 @@
+## Amaltheia Job
+## Author: Aggelos Kolaitis
+## Description: Perform package updates for hosts retrieved by Patchman
+
+## Parameters:
+## - filter       Only perform updates for machines whose names match
+##                the filter
+## - autoremove   Set to non-empty value to also autoremove old packages
+
+## Usage 1 (to autoremove packages):
+##  $ amaltheia -s this-file.yaml -v autoremove="1"
+
+## Usage 2 (without autoremove)
+##  $ amaltheia -s this-file.yaml -v filter="FILTER" autoremove=""
+
+---
+required:
+- filter
+- autoremove
+config:
+  color: true
+  log_level: debug                      # debug/info/warning/error/fatal
+strategy:
+  parallel:
+    nparallel: 8
+hosts:
+- patchman:
+    patchman_url: https://YOUR-PATCHMAN-SERVER/api/host/
+    host_name: '{{ host.hostname|lower }}'
+    filter_name: '{{ filter }}'
+    on_package_updates:
+    - apt:
+        autoremove: '{{ autoremove }}'
+        patchman_url: https://YOUR-PATCHMAN-SERVER/
+services: []
+updates: []

@@ -1,0 +1,34 @@
+## Amaltheia Job
+## Author: Aggelos Kolaitis
+## Description: Perform package updates on two hosts. Specify a custom SSH
+##              username using host arguments. Override the updates block for
+##              the slave host.
+
+## Parameters:
+## (none)
+
+## Usage 1:
+##  $ amaltheia -s this-file.yaml
+
+---
+config:
+  color: true
+  openstack_rc: /path/to/openstack.rc   # openstack credentials rc file
+  ssh_user: ubuntu
+  ssh_id_rsa_file: /path/to/ssh_id_rsa
+  # ssh_id_rsa_password: key_password   # (optional) private key password
+  ssh_config_file: /path/to/ssh_config  # (optional) ssh_config file
+  ssh_strict_host_key_checking: false
+  log_level: debug                      # debug/info/warning/error/fatal
+strategy: serial
+hosts:
+- static:
+  - master.domain.ext:
+      ssh_user: master-ubuntu
+  - slave.domain.ext:
+      ssh_user: slave-ubuntu
+      updates:
+      - dummy
+services: []
+updates:
+- apt
