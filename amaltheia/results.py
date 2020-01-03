@@ -38,8 +38,18 @@ class HostResultEntry(object):
             setattr(self, key, value)
 
     def __str__(self):
-        return ' '.join(colored('{}={}', colors.get(key)).format(
-            key, value) for key, value in self.__dict__.items())
+        items = []
+        for key, value in self.__dict__.items():
+            if str(value) == '0':
+                color = None
+            elif str(value) == 'False':
+                color = 'red'
+            else:
+                color = colors.get(key)
+
+            items.append(colored('{}={}'.format(key, value), color))
+
+        return ' '.join(items)
 
 
 Results = defaultdict(lambda: HostResultEntry())
