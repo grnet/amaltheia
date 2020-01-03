@@ -62,7 +62,8 @@ class Config:
                     cls._entries[key] = value
 
         except (ValueError, KeyError) as e:
-            logging.exception('[amaltheia] Invalid config: {}'.format(e))
+            logging.getLogger('amaltheia').exception(
+                '[amaltheia] Invalid config: {}'.format(e))
 
 
 config = Config()

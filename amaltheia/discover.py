@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
-import logging
 import re
 
+import amaltheia.log as log
 from amaltheia.utils import GET, jinja, str_or_dict
 
 
@@ -145,7 +145,7 @@ def discover(job):
 
         Discoverer = discoverers.get(disc_name)
         if Discoverer is None:
-            logging.error('[amaltheia] Unknown host discoverer {}'.format(
+            log.fatal('[amaltheia] Unknown host discoverer {}'.format(
                 disc_name))
             continue
 

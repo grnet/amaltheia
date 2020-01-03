@@ -224,16 +224,19 @@ def str_or_dict(entry):
 def bold(string):
     """Make bold string"""
     if config.color:
-        return Style.BRIGHT + string + Style.RESET_ALL
+        return Style.BRIGHT + string + Style.NORMAL
 
     return string
+
 
 def colored(string, color):
     """Add color to string"""
-    if config.color and isinstance(color, str) and hasattr(Fore, color.upper()):
-        return getattr(Fore, color.upper()) + string + Fore.RESET
+    color = str(color).upper()
+    if config.color and hasattr(Fore, color):
+        return getattr(Fore, color) + string + Fore.RESET
 
     return string
+
 
 def jinja(template, _env=None, **data):
     """Recursively renders a python dict, list or str, evaluating strings

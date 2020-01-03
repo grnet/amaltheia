@@ -25,6 +25,7 @@ colors = {
     'restored': 'magenta'
 }
 
+
 class HostResultEntry(object):
     def __init__(self, **kwargs):
 
@@ -37,6 +38,8 @@ class HostResultEntry(object):
             setattr(self, key, value)
 
     def __str__(self):
-        return ' '.join(colored('{}={}', colors.get(key)).format(key, value) for key, value in self.__dict__.items())
+        return ' '.join(colored('{}={}', colors.get(key)).format(
+            key, value) for key, value in self.__dict__.items())
+
 
 Results = defaultdict(lambda: HostResultEntry())

@@ -15,8 +15,8 @@
 
 
 from datetime import datetime, timedelta
-import logging
 
+import amaltheia.log as log
 from amaltheia.utils import (
     ssh_cmd, ssh_try_connect, str_or_dict, jinja, exec_cmd)
 
@@ -70,7 +70,7 @@ class SSHCommandUpdater(Updater):
 
         self.command = self.updater_args.get('command') or ''
         if not isinstance(self.command, str) or not self.command:
-            logging.warning('[{}] Invalid ssh command "{}"'.format(
+            log.warning('[{}] Invalid ssh command "{}"'.format(
                 self.host, self.command))
 
     def update(self):
@@ -131,33 +131,33 @@ class RebootUpdater(Updater):
         try:
             self.wait_timeout = int(self.updater_args.get('wait-timeout', 500))
         except (ValueError, TypeError):
-            logging.debug('[reboot] Default to 500 seconds timeout')
+            log.debug('[reboot] Default to 500 seconds timeout')
             self.wait_timeout = 500
 
         try:
             self.wait_check_interval = int(
                 self.updater_args.get('wait-check-interval', 10))
         except (ValueError, TypeError):
-            logging.debug('[reboot] Default to 10 seconds check interval')
+            log.debug('[reboot] Default to 10 seconds check interval')
             self.wait_check_interval = 10
 
     def update(self):
         ssh_cmd(self.host, self.host_args, 'sudo reboot')
 
         if not self.wait:
-            logging.debug('[{}] Not waiting for reboot'.format(self.host))
+            log.debug('[{}] Not waiting for reboot'.format(self.host))
             return True
 
         now = datetime.now()
         timeout = now + timedelta(seconds=self.wait_timeout)
         success = False
         while not success and datetime.now() <= timeout:
-            logging.debug('[{}] Waiting for reboot...'.format(self.host))
+            log.debug('[{}] Waiting for reboot...'.format(self.host))
             success = ssh_try_connect(
                 self.host, self.host_args, timeout=self.wait_check_interval)
 
         if not success:
-            logging.fatal('[{}] Timeout waiting for reboot'.format(self.host))
+            log.fatal('[{}] Timeout waiting for reboot'.format(self.host))
 
         return success
 

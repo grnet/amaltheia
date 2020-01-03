@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
-import logging
 from time import sleep
 from shlex import quote
 
+import amaltheia.log as log
 from amaltheia.utils import (
     openstack_cmd, openstack_cmd_table, str_or_dict, jinja)
 
@@ -115,14 +114,14 @@ class NovaComputeService(Service):
             k: v for k, v in servers.items() if v['status'] != 'OK'
         }
         if errors:
-            logging.fatal('[{}] {}'.format(self.host, errors))
+            log.fatal('[{}] {}'.format(self.host, errors))
             return False
 
         # Wait for migrations to complete
         try:
             timeout_per_server = int(self.service_args.get('timeout', 20))
         except (ValueError, TypeError):
-            logging.debug('[{}] Defaulting to 20 seconds timeout'.format(
+            log.debug('[{}] Defaulting to 20 seconds timeout'.format(
                 self.host))
 
             timeout_per_server = 20
@@ -135,15 +134,15 @@ class NovaComputeService(Service):
             server_list = openstack_cmd_table(
                 'nova hypervisor-servers {}'.format(quote(self.host)))
 
-            logging.debug('[{}] Waiting for migrations, {} remaining'.format(
+            log.debug('[{}] Waiting for migrations, {} remaining'.format(
                 self.host, len(server_list)))
 
         if server_list:
-            logging.fatal('[{}] Some migrations timed-out: {}'.format(
+            log.fatal('[{}] Some migrations timed-out: {}'.format(
                 self.host, server_list))
             return False
         else:
-            logging.debug('[{}] All servers migrated successfully'.format(
+            log.debug('[{}] All servers migrated successfully'.format(
                 self.host))
 
         return True

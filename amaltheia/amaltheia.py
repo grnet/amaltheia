@@ -18,11 +18,10 @@
 from argparse import ArgumentParser
 import sys
 import yaml
-import logging
 
+import amaltheia.log as log
 from amaltheia.config import config
 from amaltheia.strategy import run_strategy
-
 from amaltheia.utils import override
 
 
@@ -59,11 +58,10 @@ def amaltheia(args):
     job = parse_job(args)
 
     config.load(job.get('config', {}))
-    logging.basicConfig(level=config.log_level)
-    logging.getLogger('paramiko.transport').disabled = True
+    log.setup(level=config.log_level)
 
-    logging.debug('[amaltheia] Loaded variables: {}'.format(config.variables))
-    logging.debug('[amaltheia] Loaded config: {}'.format(config._entries))
+    log.debug('[amaltheia] Loaded variables: {}'.format(config.variables))
+    log.debug('[amaltheia] Loaded config: {}'.format(config._entries))
 
     run_strategy(job)
 
