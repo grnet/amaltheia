@@ -24,7 +24,7 @@ from copy import deepcopy
 from jinja2 import BaseLoader, DebugUndefined
 from jinja2.nativetypes import NativeEnvironment
 import paramiko
-from colorama import Style
+from colorama import Style, Fore
 
 from amaltheia.config import config
 
@@ -221,13 +221,19 @@ def str_or_dict(entry):
         return name, (args or {})
 
 
-def c(string):
-    '''add colors to string'''
+def bold(string):
+    """Make bold string"""
     if config.color:
         return Style.BRIGHT + string + Style.RESET_ALL
 
     return string
 
+def colored(string, color):
+    """Add color to string"""
+    if config.color and isinstance(color, str) and hasattr(Fore, color.upper()):
+        return getattr(Fore, color.upper()) + string + Fore.RESET
+
+    return string
 
 def jinja(template, _env=None, **data):
     """Recursively renders a python dict, list or str, evaluating strings
@@ -244,7 +250,7 @@ def jinja(template, _env=None, **data):
 def GET(url):
     """Returns the response of a simple GET request"""
     r = urllib.request.urlopen(url)
-    logging.info(c('[http] GET {} {}'.format(url, r.status)))
+    logging.info(bold('[http] GET {} {}'.format(url, r.status)))
     return r.read()
 
 
