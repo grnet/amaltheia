@@ -316,11 +316,13 @@ updates:
 The `exec` update action executes an arbitrary command from the host where
 amaltheia is running, capturing its return code, stdout and stderr.
 
-| Name                | Required | Type   | Example                | Description                                                                                              |
-| ------------------- | -------- | ------ | ---------------------- | -------------------------------------------------------------------------------------------------------- |
-| `exec.args`         | YES      | List   | `[echo, hi]`           | List of command and command line arguments                                                               |
-| `exec.kwargs`       | NO       | Object | `{shell: true}`        | Custom arguments to pass to [`subprocess.run()`][3] directly                                             |
-| `exec.fix-hostname` | NO       | String | `{{ host }}.my.domain` | Jinja template for configuring the host name to use (if any override is needed, e.g. adding domain name) |
+| Name                     | Required | Type    | Example                | Description                                                                                              |
+| ------------------------ | -------- | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `exec.args`              | YES      | List    | `[echo, hi]`           | List of command and command line arguments                                                               |
+| `exec.kwargs`            | NO       | Object  | `{shell: true}`        | Custom arguments to pass to [`subprocess.run()`][3] directly                                             |
+| `exec.expect-stdout`     | NO       | String  | `OK`                   | If command output matches, then the update action is considered successful.                              |
+| `exec.expect-returncode` | NO       | Integer | `0`                    | If command return code matches, then the update action is considered successful.                         |
+| `exec.fix-hostname`      | NO       | String  | `{{ host }}.my.domain` | Jinja template for configuring the host name to use (if any override is needed, e.g. adding domain name) |
 
 Example: This action will execute "echo hi" on the host where amaltheia is
 running, using `/opt/mypath` as current working directory:

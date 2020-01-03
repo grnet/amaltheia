@@ -17,7 +17,8 @@
 from datetime import datetime, timedelta
 import logging
 
-from amaltheia.utils import ssh_cmd, ssh_try_connect, str_or_dict, jinja, exec_cmd
+from amaltheia.utils import (
+    ssh_cmd, ssh_try_connect, str_or_dict, jinja, exec_cmd)
 
 
 class Updater(object):
@@ -29,7 +30,8 @@ class Updater(object):
         self.host = self.fix_hostname(host_name)
 
     def update(self):
-        """Perfoms any update actions required"""
+        """Perfoms any update actions required. Returns True on success,
+        False on error"""
         raise NotImplementedError
 
     def fix_hostname(self, host):
@@ -48,13 +50,16 @@ class DummyUpdater(Updater):
     """Dummy updater for testing amaltheia"""
     def update(self):
         print('Dummy update action output for host {}'.format(self.host))
+        return True
 
 
 class SSHTouchFileDummyUpdater(Updater):
     """Dummy SSH updater, touch a file"""
     def update(self):
         fname = self.updater_args.get('filename', '.silently.updated')
-        ssh_cmd(self.host, self.host_args, 'touch {}'.format(fname))
+        stdout, stderr = ssh_cmd(self.host, self.host_args, 'touch {}'.format(
+            fname))
+        return stderr == ""
 
 
 class SSHCommandUpdater(Updater):
@@ -71,6 +76,9 @@ class SSHCommandUpdater(Updater):
     def update(self):
         if self.command:
             ssh_cmd(self.host, self.host_args, self.command)
+            return True
+
+        return False
 
 
 class AptPackagesUpdater(Updater):
@@ -82,20 +90,30 @@ class AptPackagesUpdater(Updater):
     }"""
 
     def update(self):
-        ssh_cmd(self.host, self.host_args,
-                'sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q'
-                ' -o Dpkg::Options::=--force-confold upgrade;')
+        stdout, stderr = ssh_cmd(
+            self.host, self.host_args,
+            'sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q'
+            ' -o Dpkg::Options::=--force-confold upgrade;')
+
+        if stderr != "":
+            return False
 
         autoremove = jinja(self.updater_args.get('autoremove', False))
         if autoremove:
-            ssh_cmd(self.host, self.host_args,
-                    'sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q'
-                    ' -o Dpkg::Options::=--force-confold autoremove;')
+            stdout, stderr = ssh_cmd(
+                self.host, self.host_args,
+                'sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q'
+                ' -o Dpkg::Options::=--force-confold autoremove;')
+
+            if stderr != "":
+                return False
 
         patchman_url = self.updater_args.get('patchman_url')
         if patchman_url is not None:
             ssh_cmd(self.host, self.host_args,
                     'sudo patchman-client -s {}'.format(patchman_url))
+
+        return True
 
 
 class RebootUpdater(Updater):
@@ -147,9 +165,19 @@ class RebootUpdater(Updater):
 class ExecUpdater(Updater):
     """Execute an arbitrary command on the amaltheia host. Use with care"""
     def update(self):
-        exec_cmd(jinja(self.updater_args,
-                       host=self.fix_hostname(self.host),
-                       **self.host_args))
+        stdout, stderr, rc = exec_cmd(
+            jinja(self.updater_args, host=self.fix_hostname(self.host),
+                  **self.host_args))
+
+        expected_rc = self.updater_args.get('expect-returncode')
+        if expected_rc is not None:
+            return rc == expected_rc
+
+        expected_stdout = self.updater_args.get('expect-stdout')
+        if expected_stdout is not None:
+            return stdout == expected_stdout
+
+        return True
 
 
 updaters = {

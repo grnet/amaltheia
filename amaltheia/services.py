@@ -18,7 +18,8 @@ import logging
 from time import sleep
 from shlex import quote
 
-from amaltheia.utils import openstack_cmd, openstack_cmd_table, str_or_dict, jinja
+from amaltheia.utils import (
+    openstack_cmd, openstack_cmd_table, str_or_dict, jinja)
 
 
 class Service():
@@ -155,6 +156,8 @@ class NovaComputeService(Service):
         openstack_cmd(
             'openstack compute service set {} nova-compute --enable'.format(
                 quote(self.host)))
+
+        return True
 
 
 services = {
