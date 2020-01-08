@@ -21,7 +21,7 @@ import amaltheia.log as log
 from amaltheia.discover import discover
 from amaltheia.services import get_service
 from amaltheia.update import update
-from amaltheia.results import Results
+from amaltheia.results import HostResult
 from amaltheia.config import config
 from amaltheia.utils import str_or_dict, bold
 
@@ -35,7 +35,7 @@ class Strategy():
         self.updates = updates
         self.strategy_args = strategy_args
 
-        self.results = Results
+        self.results = []
 
         log.debug({
             'hosts': self.hosts,
@@ -53,6 +53,8 @@ class Strategy():
 
     def do_host(self, host_name, host_args):
         """Execute the whole process for a single host"""
+        r = HostResult(host_name=host_name)
+
         log.info(bold('[{}] Starting, arguments: {}'.format(
             host_name, host_args)))
 
@@ -63,57 +65,57 @@ class Strategy():
             host_name, host_args, service) for service in services)
 
         # cleanup services
-        self.results[host_name].evacuated = True
+        r.evacuated = True
         for handler in handlers:
             log.info(bold('[{}] Evacuating {} {}'.format(
                 host_name, handler.name, handler.__dict__)))
             this_success = handler.evacuate()
             if not this_success:
-                self.results[host_name].evacuated = False
-                self.results[host_name].failed += 1
+                r.evacuated = False
+                r.failed += 1
                 log.fatal('[{}] Failed to disable service {}'.format(
                     host_name, handler))
                 break
 
-            self.results[host_name].evacuated &= this_success
+            r.evacuated &= this_success
 
         # allow host to override updates
         updates = host_args.get('updates', self.updates)
 
         # do updates
-        if self.results[host_name].evacuated:
+        if r.evacuated:
             for u in updates:
                 log.info(bold('[{}] Running update action: {}'.format(
                     host_name, u)))
                 if update(host_name, host_args, u):
-                    self.results[host_name].updated += 1
+                    r.updated += 1
                 else:
-                    self.results[host_name].failed += 1
+                    r.failed += 1
 
                     log.fatal('[{}] Failed update action {}'.format(
                         host_name, u))
 
         # restore services
-        self.results[host_name].restored = True
+        r.restored = True
         for handler in handlers:
             log.info(bold('[{}] Restoring {} {}'.format(
                 host_name, handler.name, handler.__dict__)))
             if not handler.restore():
-                self.results[host_name].restored = False
-                self.results[host_name].failed += 1
+                r.restored = False
+                r.failed += 1
 
                 log.fatal('[{}] Failed to restore service {}'.format(
                     host_name, handler))
 
         log.info(bold('[{}] Done'.format(host_name)))
-        return self.results[host_name]
+        return r
 
     def output_stats(self):
         print(bold('\n\n*****************************************'))
         ok, err = 0, 0
-        for host, stats in self.results.items():
-            print(bold('[{}]'.format(host).ljust(50)), stats)
-            if stats.failed > 0:
+        for result in self.results:
+            print(result)
+            if result.failed > 0:
                 err += 1
             else:
                 ok += 1
@@ -132,6 +134,7 @@ class SerialStrategy(Strategy):
     def execute(self):
         for host_name, host_args in self.hosts.items():
             success = True
+            result = HostResult(host_name=host_name)
             try:
                 result = self.do_host(host_name, host_args)
                 if result.failed > 0:
@@ -144,10 +147,13 @@ class SerialStrategy(Strategy):
             # above that would disrupt the process
             except Exception:
                 success = False
-                self.results[host_name].failed += 1
+                result.exception = True
                 log.exception(bold(
                     '[{}] [amaltheia] An unhandled exception occured'.format(
                         host_name)))
+
+            finally:
+                self.results.append(result)
 
             if not success and self.strategy_args.get('quit_on_error'):
                 log.fatal(
@@ -180,6 +186,8 @@ class ParallelStrategy(Strategy):
                 log.fatal(bold('[{}] [amaltheia] Host failed'.format(
                     host_name)))
 
+            return result
+
         # handle all exceptions here, to cover for
         # possibly unhandled exceptions in the code
         # above that would disrupt the process
@@ -188,9 +196,11 @@ class ParallelStrategy(Strategy):
                 '[{}] [amaltheia] An unhandled exception occured'.format(
                     host_name)))
 
+            return HostResult(host_name=host_name, exception=True)
+
     def execute(self):
         with multiprocessing.Pool(processes=self.nparallel) as p:
-            p.map(self.execute_one, self.hosts)
+            self.results = p.map(self.execute_one, self.hosts)
 
 
 strategies = {

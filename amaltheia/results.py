@@ -26,13 +26,14 @@ colors = {
 }
 
 
-class HostResultEntry(object):
+class HostResult(object):
     def __init__(self, **kwargs):
 
         self.evacuated = False
         self.updated = 0
         self.failed = 0
         self.restored = False
+        self.exception = False
 
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -40,16 +41,16 @@ class HostResultEntry(object):
     def __str__(self):
         items = []
         for key, value in self.__dict__.items():
+            if key == 'host_name' or key == 'exception' and not value:
+                continue
+
             if str(value) == '0':
                 color = None
-            elif str(value) == 'False':
+            elif str(value) == 'False' and key != 'exception':
                 color = 'red'
             else:
                 color = colors.get(key)
 
             items.append(colored('{}={}'.format(key, value), color))
 
-        return ' '.join(items)
-
-
-Results = defaultdict(lambda: HostResultEntry())
+        return '{}{}'.format(self.host_name.ljust(50), ' '.join(items))

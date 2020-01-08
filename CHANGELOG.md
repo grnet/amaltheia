@@ -12,6 +12,8 @@ Keep a track of all notable changes in this file.
 
 ### Fixed
 
+- Fixed parallel strategy not working with host results
+
 ### Changed
 
 - Reduced Docker image size
