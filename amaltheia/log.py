@@ -40,6 +40,7 @@ def setup(level):
     handler.setLevel(level)
     handler.setFormatter(AmaltheiaFormatter("%(levelname)s:%(name)s:%(msg)s"))
     logging.getLogger('amaltheia').addHandler(handler)
+    logging.getLogger('amaltheia').propagate = False
     logging.getLogger('paramiko.transport').disabled = True
 
 
