@@ -119,12 +119,12 @@ class NovaComputeService(Service):
 
         # Wait for migrations to complete
         try:
-            timeout_per_server = int(self.service_args.get('timeout', 20))
+            timeout_per_server = int(self.service_args.get('timeout', 40))
         except (ValueError, TypeError):
-            log.debug('[{}] Defaulting to 20 seconds timeout'.format(
+            log.debug('[{}] Defaulting to 40 seconds timeout'.format(
                 self.host))
 
-            timeout_per_server = 20
+            timeout_per_server = 40
 
         timeout = len(server_list) * timeout_per_server
         while server_list and timeout > 0:
