@@ -115,7 +115,7 @@ class Strategy():
         ok, err = 0, 0
         for result in self.results:
             print(result)
-            if result.failed > 0:
+            if result.exception or result.failed > 0:
                 err += 1
             else:
                 ok += 1
