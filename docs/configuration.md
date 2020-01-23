@@ -144,6 +144,7 @@ each of these conditions. The complete format is:
 | `patchman.filter-name`        | NO       | String          | `"lar04.*"`                                    | Filter out any machines whose name does not match the regular expression                                                                       |
 | `patchman.on-package-updates` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that have available package updates                                                           |
 | `patchman.on-reboot-required` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that require a reboot                                                                         |
+| `patchman.skip-ok`            | NO       | Boolean         | `false`                                        | If `true`, then hosts that require no updates and/or reboot will not be added in the list                                                      |
 
 Example 1: This example queries the Patchman server for hosts whose names match
 the filter `lar04..` ("lar04" and two more characters). It adds an `apt` action

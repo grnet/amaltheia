@@ -98,6 +98,7 @@ class PatchmanDiscoverer(Discoverer):
         self.patchman_url = self.args['patchman-url']
         self.host_name = self.args['host-name']
         self.filter_name = jinja(self.args.get('filter-name', '.*'))
+        self.skip_ok = self.args['skip-ok']
 
     def discover(self):
         results = []
@@ -123,6 +124,10 @@ class PatchmanDiscoverer(Discoverer):
                 host_args.setdefault('updates', [])
                 host_args['updates'].extend(
                     self.args.get('on-reboot-required'))
+
+            # skip hosts with no actionable items
+            if not host_args and self.skip_ok:
+                continue
 
             hosts[host_name] = host_args
 

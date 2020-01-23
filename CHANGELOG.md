@@ -9,6 +9,7 @@ Keep a track of all notable changes in this file.
 - Check result of update actions
 - Print results for each host at the end
 - Option `expect-returncode` and `expect-stdout` for `exec` update action
+- Option `skip-ok` for `patchman` host discoverer.
 
 ### Fixed
 
