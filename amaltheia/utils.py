@@ -112,16 +112,16 @@ def _ssh_client(host_name, host_args, **kwargs):
 
     args = {
         'hostname': host_name,
-        'username': host_args.get('ssh_user', config.ssh_user),
-        'key_filename': host_args.get('ssh_id_rsa_file',
+        'username': host_args.get('ssh-user', config.ssh_user),
+        'key_filename': host_args.get('ssh-id-rsa-file',
                                       config.ssh_id_rsa_file),
-        'password': host_args.get('ssh_id_rsa_password',
+        'password': host_args.get('ssh-id-rsa-password',
                                   config.ssh_id_rsa_password),
-        'timeout': host_args.get('ssh_timeout', 5)
+        'timeout': host_args.get('ssh-timeout', 5)
     }
 
     try:
-        proxy_command = host_args.get('ssh_proxycommand')
+        proxy_command = host_args.get('ssh-proxycommand')
         if proxy_command is None:
             with open(config.ssh_config_file, 'r') as fin:
                 conf = paramiko.SSHConfig()

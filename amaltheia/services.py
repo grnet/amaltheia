@@ -67,7 +67,7 @@ class NovaComputeService(Service):
         """Disable nova-compute service on this host, migrate away
         all running and stopped instances"""
 
-        if self.service_args.get('skip_evacuate'):
+        if self.service_args.get('skip-evacuate'):
             return True
 
         # Disable nova-compute
@@ -149,7 +149,7 @@ class NovaComputeService(Service):
 
     def restore(self):
         """Restores nova-compute service"""
-        if self.service_args.get('skip_restore'):
+        if self.service_args.get('skip-restore'):
             return True
 
         openstack_cmd(

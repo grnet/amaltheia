@@ -12,17 +12,17 @@
 required:
 - netbox_site
 config:
-  log_level: info                      # debug/info/warning/error/fatal
+  log-level: info                      # debug/info/warning/error/fatal
 strategy:
   parallel:
     nparallel: 2
 hosts:
 - netbox:
-    netbox_url: "https://my-netbox-server/api/dcim/devices/?site={{ netbox_site }}&limit=0&status=1"
-    filter_name: worker-..
-    host_name: '{{ host.name|lower }}.domain.ext'
-    host_args:
-      ssh_user: ubuntu
+    netbox-url: "https://my-netbox-server/api/dcim/devices/?site={{ netbox_site }}&limit=0&status=1"
+    filter-name: worker-..
+    host-name: '{{ host.name|lower }}.domain.ext'
+    host-args:
+      ssh-user: ubuntu
 services: []
 updates:
 - dummy

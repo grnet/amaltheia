@@ -155,9 +155,9 @@ class SerialStrategy(Strategy):
             finally:
                 self.results.append(result)
 
-            if not success and self.strategy_args.get('quit_on_error'):
+            if not success and self.strategy_args.get('quit-on-error'):
                 log.fatal(
-                    bold('[amaltheia] "quit_on_error" is enabled, quitting'))
+                    bold('[amaltheia] "quit-on-error" is enabled, quitting'))
                 break
 
 

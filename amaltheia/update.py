@@ -108,7 +108,7 @@ class AptPackagesUpdater(Updater):
             if stderr != "":
                 return False
 
-        patchman_url = self.updater_args.get('patchman_url')
+        patchman_url = self.updater_args.get('patchman-url')
         if patchman_url is not None:
             ssh_cmd(self.host, self.host_args,
                     'sudo patchman-client -s {}'.format(patchman_url))

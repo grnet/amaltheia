@@ -34,8 +34,8 @@ class Config:
 
     def __getattribute__(self, name):
         """overrides so that config.OPTION returns config.entries['OPTION']"""
-        if name in super().__getattribute__('_entries'):
-            return super().__getattribute__('_entries')[name]
+        if name.replace('-', '_') in super().__getattribute__('_entries'):
+            return super().__getattribute__('_entries')[name.replace('-', '_')]
 
         return super().__getattribute__(name)
 
@@ -45,6 +45,7 @@ class Config:
         try:
             for key, value in config.items():
                 # allow setting log_level via int or string
+                key = key.replace('-', '_')
                 if key == 'log_level':
                     if isinstance(value, int):
                         cls._entries[key] = value

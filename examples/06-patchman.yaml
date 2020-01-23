@@ -11,7 +11,7 @@
 ##  $ amaltheia -s this-file.yaml -v autoremove="1"
 
 ## Usage 2 (without autoremove)
-##  $ amaltheia -s this-file.yaml -v filter="FILTER" autoremove=""
+##  $ amaltheia -s this-file.yaml -v filter="FILTER" autoremove=false
 
 ---
 required:
@@ -19,18 +19,18 @@ required:
 - autoremove
 config:
   color: true
-  log_level: debug                      # debug/info/warning/error/fatal
+  log-level: debug                      # debug/info/warning/error/fatal
 strategy:
   parallel:
     nparallel: 8
 hosts:
 - patchman:
-    patchman_url: https://YOUR-PATCHMAN-SERVER/api/host/
-    host_name: '{{ host.hostname|lower }}'
-    filter_name: '{{ filter }}'
-    on_package_updates:
+    patchman-url: https://YOUR-PATCHMAN-SERVER/api/host/
+    host-name: '{{ host.hostname|lower }}'
+    filter-name: '{{ filter }}'
+    on-package-updates:
     - apt:
         autoremove: '{{ autoremove }}'
-        patchman_url: https://YOUR-PATCHMAN-SERVER/
+        patchman-url: https://YOUR-PATCHMAN-SERVER/
 services: []
 updates: []

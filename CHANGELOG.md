@@ -13,6 +13,7 @@ Keep a track of all notable changes in this file.
 ### Fixed
 
 - Fixed parallel strategy not working with host results
+- Consistently use `-` instead of `_` as word separator in arguments
 
 ### Changed
 

@@ -5,7 +5,7 @@
 | Software Name | Amaltheia        |
 | Version       | 0.2              |
 | Author        | Aggelos Kolaitis |
-| Last Update   | 2019-12-09       |
+| Last Update   | 2020-01-23       |
 
 All configuration for an amaltheia job is defined in a single YAML file. Some
 configuration can be set when executing the job using either job variables or
@@ -53,13 +53,13 @@ This section contains general options for amaltheia.
 | Name                                  | Required | Type       | Example           | Description                                                                                                                                         |
 | ------------------------------------- | -------- | ---------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `config.color`                        | NO       | boolean    | `true`            | Use ANSI formatting sequences for making the output more readable. Disable if output is not a tty                                                   |
-| `config.log_level`                    | NO       | int/string | `info`            | Log level to set. Translates to the python logging module levels. Can be either a number or one of `debug`, `info`, `warning`, `error`, `exception` |
-| `config.openstack_rc`                 | YES*     | string     | `openstack.rc`    | Path to OpenStack RC file, if using OpenStack actions                                                                                               |
-| `config.ssh_user`                     | YES**    | string     | `ubuntu`          | Username to use for ssh access on remote machines (if needed)                                                                                       |
-| `config.ssh_id_rsa`                   | YES**    | string     | `./ssh_id_rsa`    | Path to SSH identity to use for connections to remote machines (if needed)                                                                          |
-| `config.ssh_id_rsa_password`          | YES**    | string     | `my_key_password` | Password to use for SSH identity (if needed)                                                                                                        |
-| `config.ssh_config_file`              | YES**    | string     | `./ssh_config`    | Optional ssh config file to use for connecting to remote machines                                                                                   |
-| `config.ssh_strict_host_key_checking` | YES**    | boolean    | `true`            | Whether to enable SSH strict host key checking                                                                                                      |
+| `config.log-level`                    | NO       | int/string | `info`            | Log level to set. Translates to the python logging module levels. Can be either a number or one of `debug`, `info`, `warning`, `error`, `exception` |
+| `config.openstack-rc`                 | YES*     | string     | `openstack.rc`    | Path to OpenStack RC file, if using OpenStack actions                                                                                               |
+| `config.ssh-user`                     | YES**    | string     | `ubuntu`          | Username to use for ssh access on remote machines (if needed)                                                                                       |
+| `config.ssh-id-rsa`                   | YES**    | string     | `./ssh-id-rsa`    | Path to SSH identity to use for connections to remote machines (if needed)                                                                          |
+| `config.ssh-id-rsa-password`          | YES**    | string     | `my-key-password` | Password to use for SSH identity (if needed)                                                                                                        |
+| `config.ssh-config-file`              | YES**    | string     | `./ssh-config`    | Optional ssh config file to use for connecting to remote machines                                                                                   |
+| `config.ssh-strict-host-key-checking` | YES**    | boolean    | `true`            | Whether to enable SSH strict host key checking                                                                                                      |
 
 
 `*` Only when evacuating/restoring OpenStack services, e.g. `nova-compute`. See
@@ -72,10 +72,10 @@ Complete example for the configuration block:
 ```yaml
 config:
   color: true
-  ssh_user: ubuntu
-  ssh_id_rsa_file: /path/to/ssh_id_rsa
-  ssh_strict_host_key_checking: false
-  log_level: info
+  ssh-user: ubuntu
+  ssh-id-rsa-file: /path/to/ssh-id-rsa
+  ssh-strict-host-key-checking: false
+  log-level: info
 ```
 
 ## Hosts block
@@ -101,10 +101,10 @@ hosts:
   - myhost2.domain.ext
   - 1.2.3.4
 - patchman:
-    patchman_url: https://patchman.domain.ext/patchman/api/host/
-    host_name: '{{ host.hostname | lower }}'
-    filter_name: 'lar04..'
-    on_package_updates:
+    patchman-url: https://patchman.domain.ext/patchman/api/host/
+    host-name: '{{ host.hostname | lower }}'
+    filter-name: 'lar04..'
+    on-package-updates:
     - apt
 ```
 
@@ -121,9 +121,9 @@ Example:
 hosts:
 - static:
   - host1.with.custom.ssh.config:
-      ssh_user: ubuntu
-      ssh_id_rsa_file: ssh_id_rsa
-      ssh_id_rsa_password: my-safe-key-password
+      ssh-user: ubuntu
+      ssh-id-rsa-file: ssh-id-rsa
+      ssh-id-rsa-password: my-safe-key-password
   - host2
   - 10.0.0.14
 ```
@@ -139,11 +139,11 @@ each of these conditions. The complete format is:
 
 | Name                          | Required | Type            | Example                                        | Description                                                                                                                                    |
 | ----------------------------- | -------- | --------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `patchman.patchman_url`       | YES      | String          | `"https://patchman.server/patchman/api/host/"` | Full Path to the Patchman API for retrieving the list of hosts                                                                                 |
-| `patchman.host_name`          | NO       | String          | `"{{ host.hostname }}"`                        | Override host name returned by Patchman for each host. Can be a Jinja template. Access the patchman host information using the `host` variable |
-| `patchman.filter_name`        | NO       | String          | `"lar04.*"`                                    | Filter out any machines whose name does not match the regular expression                                                                       |
-| `patchman.on_package_updates` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that have available package updates                                                           |
-| `patchman.on_reboot_required` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that require a reboot                                                                         |
+| `patchman.patchman-url`       | YES      | String          | `"https://patchman.server/patchman/api/host/"` | Full Path to the Patchman API for retrieving the list of hosts                                                                                 |
+| `patchman.host-name`          | NO       | String          | `"{{ host.hostname }}"`                        | Override host name returned by Patchman for each host. Can be a Jinja template. Access the patchman host information using the `host` variable |
+| `patchman.filter-name`        | NO       | String          | `"lar04.*"`                                    | Filter out any machines whose name does not match the regular expression                                                                       |
+| `patchman.on-package-updates` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that have available package updates                                                           |
+| `patchman.on-reboot-required` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that require a reboot                                                                         |
 
 Example 1: This example queries the Patchman server for hosts whose names match
 the filter `lar04..` ("lar04" and two more characters). It adds an `apt` action
@@ -153,12 +153,12 @@ for those that require a reboot.
 ```yaml
 hosts:
 - patchman:
-    patchman_url: https://patchman.server/patchman/api/host/
-    host_name: "{{ host.hostname }}.domain.gr"
-    filter_name: "lar04.."
-    on_package_updates:
+    patchman-url: https://patchman.server/patchman/api/host/
+    host-name: "{{ host.hostname }}.domain.gr"
+    filter-name: "lar04.."
+    on-package-updates:
     - apt
-    on_reboot_required:
+    on-reboot-required:
     - reboot
 ```
 
@@ -169,10 +169,10 @@ its Rest API. The complete format of its arguments is:
 
 | Name                 | Required | Type   | Example                                     | Description                                                                                                                               |
 | -------------------- | -------- | ------ | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `netbox.netbox_url`  | YES      | String | `"https://netbox.server/api/dcim/devices/"` | Full Path to the NetBox API endpoint for retrieving the list of hosts                                                                     |
-| `netbox.host_name`   | NO       | String | `"{{ host.name|lower }}.domain.gr"`         | Jinja template for host name. NetBox data can be retrieved via the `host` variable                                                        |
-| `netbox.host_args`   | NO       | Object | ` `                                         | Object for custom host arguments. Can use Jinja templates for either keys or values. NetBox data can be retrieved via the `host` variable |
-| `netbox.filter_name` | NO       | String | `"lar04.."`                                 | Filter out machines whose name does not match the specified regular expression                                                            |
+| `netbox.netbox-url`  | YES      | String | `"https://netbox.server/api/dcim/devices/"` | Full Path to the NetBox API endpoint for retrieving the list of hosts                                                                     |
+| `netbox.host-name`   | NO       | String | `"{{ host.name|lower }}.domain.gr"`         | Jinja template for host name. NetBox data can be retrieved via the `host` variable                                                        |
+| `netbox.host-args`   | NO       | Object | ` `                                         | Object for custom host arguments. Can use Jinja templates for either keys or values. NetBox data can be retrieved via the `host` variable |
+| `netbox.filter-name` | NO       | String | `"lar04.."`                                 | Filter out machines whose name does not match the specified regular expression                                                            |
 
 Example: The example below retrieves a list of hosts from NetBox. The API url
 restricts the results using NetBox options: it will only return active hosts
@@ -185,13 +185,13 @@ host argument `from_netbox` will be set to True.
 ```yaml
 updates:
 - netbox:
-    netbox_url: https://netbox.noc.grnet.gr/api/dcim/devices/?site=myShinyDC&limit=0&device_type_id=12&status=1
-    filter_name: "lar04.*"
-    host_name: "{{ host.name | lower }}.myShinyDC.gr"
-    host_args:
-      from_netbox: true
-      ssh_user: ubuntu
-      ssh_id_rsa_file: my-id-rsa
+    netbox-url: https://netbox.noc.grnet.gr/api/dcim/devices/?site=myShinyDC&limit=0&device_type_id=12&status=1
+    filter-name: "lar04.*"
+    host-name: "{{ host.name | lower }}.myShinyDC.gr"
+    host-args:
+      from-netbox: true
+      ssh-user: ubuntu
+      ssh-id-rsa-file: my-id-rsa
 ```
 
 ## Host arguments
@@ -200,11 +200,11 @@ The following host arguments will be recognised by amaltheia:
 
 | Name                  | Required | Type   | Example                        | Description                     |
 | --------------------- | -------- | ------ | ------------------------------ | ------------------------------- |
-| `ssh_user`            | NO       | String | `"ubuntu"`                     | Override default SSH username   |
-| `ssh_id_rsa_file`     | NO       | String | `"my_id_rsa"`                  | Override default SSH key to use |
-| `ssh_id_rsa_password` | NO       | String | `"my-id-rsa-password"`         | Override SSH key password       |
-| `ssh_timeout`         | NO       | String | `10`                           | SSH connection timeout          |
-| `ssh_proxycommand`    | NO       | String | `ssh -q -W ssh-gateway-server` | SSH Proxy command               |
+| `ssh-user`            | NO       | String | `"ubuntu"`                     | Override default SSH username   |
+| `ssh-id-rsa-file`     | NO       | String | `"my-id-rsa"`                  | Override default SSH key to use |
+| `ssh-id-rsa-password` | NO       | String | `"my-id-rsa-password"`         | Override SSH key password       |
+| `ssh-timeout`         | NO       | String | `10`                           | SSH connection timeout          |
+| `ssh-proxycommand`    | NO       | String | `ssh -q -W ssh-gateway-server` | SSH Proxy command               |
 
 
 ## Updates Block
@@ -433,7 +433,7 @@ dictionaries. Consider the following example:
 
 ```yaml
 config:
-  log_level: info
+  log-level: info
 hosts:
 - static:
   - my.host.name
@@ -458,8 +458,8 @@ packages on a single host:
 
 ```yaml
 config:
-  log_level: info
-  ssh_id_rsa: path/to/ssh_id_rsa_key
+  log-level: info
+  ssh-id-rsa: path/to/ssh-id-rsa-key
 hosts:
 - static:
   - '{{ myhost }}'
@@ -491,7 +491,7 @@ section:
 requires:
 - myhost
 config:
-  log_level: info
+  log-level: info
 hosts:
 - static:
   - '{{ myhost }}'

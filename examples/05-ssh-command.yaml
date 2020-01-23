@@ -11,13 +11,13 @@
 ---
 config:
   color: true
-  openstack_rc: /path/to/openstack.rc   # openstack credentials rc file
-  ssh_user: ubuntu
-  ssh_id_rsa_file: /path/to/ssh_id_rsa
-  # ssh_id_rsa_password: key_password   # (optional) private key password
-  ssh_config_file: /path/to/ssh_config  # (optional) ssh_config file
-  ssh_strict_host_key_checking: false
-  log_level: debug                      # debug/info/warning/error/fatal
+  openstack-rc: /path/to/openstack.rc   # openstack credentials rc file
+  ssh-user: ubuntu
+  ssh-id-rsa-file: /path/to/ssh-id-rsa
+  # ssh-id-rsa-password: key-password   # (optional) private key password
+  ssh-config-file: /path/to/ssh-config  # (optional) ssh-config file
+  ssh-strict-host-key-checking: false
+  log-level: debug                      # debug/info/warning/error/fatal
 strategy: serial
 hosts:
 - static:

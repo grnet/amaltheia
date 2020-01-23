@@ -10,9 +10,9 @@
 
 ---
 config:
-  log_level: info                      # debug/info/warning/error/fatal
-  ssh_user: nova
-  ssh_id_rsa_file: ./ssh_id_rsa
+  log-level: info                      # debug/info/warning/error/fatal
+  ssh-user: nova
+  ssh-id-rsa-file: ./ssh-id-rsa
 strategy:
   parallel:
     nparallel: 4

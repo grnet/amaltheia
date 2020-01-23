@@ -58,15 +58,15 @@ class NetBoxDiscoverer(Discoverer):
     """Discover hosts using the NetBox Rest API"""
     def __init__(self, discover_args):
         super(NetBoxDiscoverer, self).__init__(discover_args)
-        if 'netbox_url' not in self.args:
-            raise ValueError('missing "netbox_url" for netbox discoverer')
+        if 'netbox-url' not in self.args:
+            raise ValueError('missing "netbox-url" for netbox discoverer')
 
-        if 'host_name' not in self.args:
-            raise ValueError('missing "host_name" for netbox discoverer')
+        if 'host-name' not in self.args:
+            raise ValueError('missing "host-name" for netbox discoverer')
 
-        self.host_name = self.args['host_name']
-        self.netbox_url = jinja(self.args['netbox_url'])
-        self.filter_name = jinja(self.args.get('filter_name', '.*'))
+        self.host_name = self.args['host-name']
+        self.netbox_url = jinja(self.args['netbox-url'])
+        self.filter_name = jinja(self.args.get('filter-name', '.*'))
 
     def discover(self):
         api_result = json.loads(GET(self.netbox_url))
@@ -78,7 +78,7 @@ class NetBoxDiscoverer(Discoverer):
                 continue
 
             host_name = jinja(self.host_name, host=host)
-            host_args = jinja(self.args.get('host_args') or {}, host=host)
+            host_args = jinja(self.args.get('host-args') or {}, host=host)
 
             hosts[host_name] = host_args
 
@@ -89,15 +89,15 @@ class PatchmanDiscoverer(Discoverer):
     """Discover hosts from Patchman Rest API"""
     def __init__(self, discover_args):
         super(PatchmanDiscoverer, self).__init__(discover_args)
-        if 'patchman_url' not in self.args:
-            raise ValueError('missing "patchman_url" for Patchman discoverer')
+        if 'patchman-url' not in self.args:
+            raise ValueError('missing "patchman-url" for Patchman discoverer')
 
-        if 'host_name' not in self.args:
-            raise ValueError('missing "host_name" for Patchman discoverer')
+        if 'host-name' not in self.args:
+            raise ValueError('missing "host-name" for Patchman discoverer')
 
-        self.patchman_url = self.args['patchman_url']
-        self.host_name = self.args['host_name']
-        self.filter_name = jinja(self.args.get('filter_name', '.*'))
+        self.patchman_url = self.args['patchman-url']
+        self.host_name = self.args['host-name']
+        self.filter_name = jinja(self.args.get('filter-name', '.*'))
 
     def discover(self):
         results = []
@@ -112,17 +112,17 @@ class PatchmanDiscoverer(Discoverer):
                 continue
 
             host_name = jinja(self.host_name, host=host)
-            host_args = jinja(self.args.get('host_args') or {}, host=host)
+            host_args = jinja(self.args.get('host-args') or {}, host=host)
 
-            if host['updates'] and self.args.get('on_package_updates'):
+            if host['updates'] and self.args.get('on-package-updates'):
                 host_args.setdefault('updates', [])
                 host_args['updates'].extend(
-                    self.args.get('on_package_updates'))
+                    self.args.get('on-package-updates'))
 
-            if host['reboot_required'] and self.args.get('on_reboot_required'):
+            if host['reboot_required'] and self.args.get('on-reboot-required'):
                 host_args.setdefault('updates', [])
                 host_args['updates'].extend(
-                    self.args.get('on_reboot_required'))
+                    self.args.get('on-reboot-required'))
 
             hosts[host_name] = host_args
 
