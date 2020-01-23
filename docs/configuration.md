@@ -184,7 +184,7 @@ the hosts whose name does not match `lar04.*` be discarded. Also note the
 host argument `from_netbox` will be set to True.
 
 ```yaml
-updates:
+hosts:
 - netbox:
     netbox-url: https://netbox.noc.grnet.gr/api/dcim/devices/?site=myShinyDC&limit=0&device_type_id=12&status=1
     filter-name: "lar04.*"
@@ -194,6 +194,76 @@ updates:
       ssh-user: ubuntu
       ssh-id-rsa-file: my-id-rsa
 ```
+
+
+### HTTP discoverer
+
+The HTTP discoverer retrieves a list of hosts from an HTTP url. The complete
+format of its arguments is:
+
+| Name                   | Required | Type   | Example                                         | Description                                                                    |
+| ---------------------- | -------- | ------ | ----------------------------------------------- | ------------------------------------------------------------------------------ |
+| `http.request.url`     | YES      | String | `"https://netbox.server/api/dcim/devices/"`     | Full path to the HTTP API url.                                                 |
+| `http.request.method`  | NO       | String | `"GET"`                                         | HTTP method to use                                                             |
+| `http.request.headers` | NO       | Object | `headers: {X-Auth-Token: aaaaa-bbbbbbb-cccccc}` | HTTP request headers to send                                                   |
+| `http.request.json`    | NO       | String | `{data: test}`                                  | HTTP request parameters to be passed as a JSON body |
+| `http.results`  | YES | String | `{{ response.results }}` | Jinja template for the JSON field to use for querying hosts. Result can be either a dictionary or a list |
+| `http.next-url-field`  | YES | String | `{{ response.next }}` | Jinja template for the JSON field to use as next URL, when API results use paging. If this value is a valid URL, then the discoverer will continue querying |
+| `http.parse.host-name` | YES | String | `{{ item }}` | For each item in the results, set discovered host name |
+| `http.parse.host-args` | NO | Object | `{custom-field: "{{ item.value }}"}` | Jinja template for extra host specific arguments to get |
+| `http.match` | NO | List of objects | `[{regex: "<some-regex>", value: "{{ item.value }}"}, ...]` | List of match rules for each host |
+
+For the `http.parse` section, you can use Jinja with the `{{ item }}` variable.
+If results are a list, then `{{ item }}` will be a list item. If results is a
+dictionary, then you can use `{{ item.key }}` and `{{ item.value }}`.
+
+A complete example can be found below:
+
+```yaml
+hosts:
+- http:
+    request:
+      url: https://my.api.server/url
+      method: GET
+      headers:
+        X-Auth: 18976319827369876d98f76asdfasdf
+      json:
+        parameter: value
+    results-field: "{{ response.results }}"
+    next-url-field: "{{ response.next }}"
+    match:
+    - regex: lar04..
+      value: "{{ item.key }}"
+    parse:
+      host-name: "{{ item.key }}"
+      host-args:
+        IPMI: "{{ item.value.IPMI_address }}"
+```
+
+When paired with an API that returns a response like the following:
+
+```json
+GET https://my.api.server/url
+{
+  "next": "https://my.api.server/url?page=2",
+  "results": {
+    "host_1": {"IPMI_address": "10.0.0.1", "IP_address": "10.1.0.1"},
+    "host_2": {"IPMI_address": "10.0.0.2", "IP_address": "10.1.0.2"},
+  }
+}
+
+GET https://my.api.server/url?page=2
+{
+  "next": null,
+  "results": {
+    "host_3": {"IPMI_address": "10.0.0.3", "IP_address": "10.1.0.3"},
+  }
+}
+```
+
+Then the http discoverer will retrieve hosts `host_1`, `host_2` and `host_3`,
+while also setting the `IPMI` host argument for each one of them.
+
 
 ## Host arguments
 

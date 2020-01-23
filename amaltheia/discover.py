@@ -15,6 +15,7 @@
 
 import json
 import re
+import urllib.request
 
 import amaltheia.log as log
 from amaltheia.utils import GET, jinja, str_or_dict
@@ -134,7 +135,63 @@ class PatchmanDiscoverer(Discoverer):
         return hosts
 
 
+class HttpDiscoverer(Discoverer):
+    """Discover hosts from an HTTP API"""
+    def __init__(self, discover_args):
+        super(HttpDiscoverer, self).__init__(discover_args)
+        if 'request' not in self.args:
+            raise ValueError('missing "request" for HTTP discoverer')
+
+        if 'url' not in self.args['request']:
+            raise ValueError('missing "request.url" for HTTP discoverer')
+
+        if 'results' not in self.args:
+            raise ValueError('missing "results" for HTTP discoverer')
+
+        if 'parse' not in self.args:
+            raise ValueError('missing "parse" for HTTP discoverer')
+
+        if 'host-name' not in self.args['parse']:
+            raise ValueError('missing "parse.host-name" for HTTP discoverer')
+
+        self.request_params = self.args.get('request', {})
+        self.request = urllib.request.Request(self.request_params['url'])
+
+        self.request.headers = self.request_params.get('headers', {})
+        if self.request_params.get('json', {}):
+            self.request.headers['content-type'] = 'application/json'
+            self.request.data = json.dumps(self.request_params['json']).encode()
+
+        self.results_template = self.args['results']
+        self.host_name_template = self.args['parse']['host-name']
+        self.host_args_template = self.args['parse']['host-args']
+
+        self.match_filters = self.args.get('match', [])
+
+
+    def discover(self):
+        response = json.loads(urllib.request.urlopen(self.request).read())
+        results = jinja(self.results_template, response=response)
+
+        if isinstance(results, dict):
+            results = [{'key': k, 'value': v} for k, v in results.items()]
+
+        hosts = {}
+        for item in results:
+            if any(not re.search(m['regex'], m['value'])
+                   for m in jinja(self.match_filters, item=item)):
+                continue
+
+            host_name = jinja(self.host_name_template, item=item)
+            host_args = jinja(self.host_args_template, item=item)
+
+            hosts[host_name] = host_args
+
+        return hosts
+
+
 discoverers = {
+    'http': HttpDiscoverer,
     'static': StaticDiscoverer,
     'netbox': NetBoxDiscoverer,
     'patchman': PatchmanDiscoverer
