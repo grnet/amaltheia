@@ -97,8 +97,8 @@ class PatchmanDiscoverer(Discoverer):
 
         self.patchman_url = self.args['patchman-url']
         self.host_name = self.args['host-name']
-        self.filter_name = jinja(self.args.get('filter-name', '.*'))
-        self.skip_ok = self.args['skip-ok']
+        self.filter_name = jinja(self.args.get('filter-name', '.*')) or ''
+        self.skip_ok = self.args.get('skip-ok', False)
 
     def discover(self):
         results = []
