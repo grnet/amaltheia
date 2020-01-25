@@ -44,7 +44,7 @@ class Updater(object):
         from the "fix-hostname" argument, or return the hostname as is"""
         fix_hostname = self.updater_args.get('fix-hostname')
         if fix_hostname is not None:
-            return jinja(fix_hostname, host=host)
+            return jinja(fix_hostname, host=host, host_args=self.host_args)
 
         return host
 
