@@ -125,7 +125,7 @@ class RebootUpdater(Updater):
         "wait_check_interval": 5        # check interval for host
     }"""
 
-    def __init__(self, updater_args):
+    def __init__(self, host_name, host_args, updater_args):
         self.wait = self.updater_args.get('wait', True)
 
         try:
