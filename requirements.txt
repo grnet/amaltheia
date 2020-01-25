@@ -2,3 +2,4 @@ paramiko
 python-openstackclient
 colorama
 jinja2
+python-jenkins

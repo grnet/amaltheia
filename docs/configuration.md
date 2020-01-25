@@ -201,17 +201,17 @@ hosts:
 The HTTP discoverer retrieves a list of hosts from an HTTP url. The complete
 format of its arguments is:
 
-| Name                   | Required | Type   | Example                                         | Description                                                                    |
-| ---------------------- | -------- | ------ | ----------------------------------------------- | ------------------------------------------------------------------------------ |
-| `http.request.url`     | YES      | String | `"https://netbox.server/api/dcim/devices/"`     | Full path to the HTTP API url.                                                 |
-| `http.request.method`  | NO       | String | `"GET"`                                         | HTTP method to use                                                             |
-| `http.request.headers` | NO       | Object | `headers: {X-Auth-Token: aaaaa-bbbbbbb-cccccc}` | HTTP request headers to send                                                   |
-| `http.request.json`    | NO       | String | `{data: test}`                                  | HTTP request parameters to be passed as a JSON body |
-| `http.results`  | YES | String | `{{ response.results }}` | Jinja template for the JSON field to use for querying hosts. Result can be either a dictionary or a list |
-| `http.next-url-field`  | YES | String | `{{ response.next }}` | Jinja template for the JSON field to use as next URL, when API results use paging. If this value is a valid URL, then the discoverer will continue querying |
-| `http.parse.host-name` | YES | String | `{{ item }}` | For each item in the results, set discovered host name |
-| `http.parse.host-args` | NO | Object | `{custom-field: "{{ item.value }}"}` | Jinja template for extra host specific arguments to get |
-| `http.match` | NO | List of objects | `[{regex: "<some-regex>", value: "{{ item.value }}"}, ...]` | List of match rules for each host |
+| Name                   | Required | Type            | Example                                                     | Description                                                                                                                                                 |
+| ---------------------- | -------- | --------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `http.request.url`     | YES      | String          | `"https://netbox.server/api/dcim/devices/"`                 | Full path to the HTTP API url.                                                                                                                              |
+| `http.request.method`  | NO       | String          | `"GET"`                                                     | HTTP method to use                                                                                                                                          |
+| `http.request.headers` | NO       | Object          | `headers: {X-Auth-Token: aaaaa-bbbbbbb-cccccc}`             | HTTP request headers to send                                                                                                                                |
+| `http.request.json`    | NO       | String          | `{data: test}`                                              | HTTP request parameters to be passed as a JSON body                                                                                                         |
+| `http.results`         | YES      | String          | `{{ response.results }}`                                    | Jinja template for the JSON field to use for querying hosts. Result can be either a dictionary or a list                                                    |
+| `http.next-url-field`  | YES      | String          | `{{ response.next }}`                                       | Jinja template for the JSON field to use as next URL, when API results use paging. If this value is a valid URL, then the discoverer will continue querying |
+| `http.parse.host-name` | YES      | String          | `{{ item }}`                                                | For each item in the results, set discovered host name                                                                                                      |
+| `http.parse.host-args` | NO       | Object          | `{custom-field: "{{ item.value }}"}`                        | Jinja template for extra host specific arguments to get                                                                                                     |
+| `http.match`           | NO       | List of objects | `[{regex: "<some-regex>", value: "{{ item.value }}"}, ...]` | List of match rules for each host                                                                                                                           |
 
 For the `http.parse` section, you can use Jinja with the `{{ item }}` variable.
 If results are a list, then `{{ item }}` will be a list item. If results is a
@@ -360,6 +360,54 @@ to return so that amaltheia returns quickly.
 updates:
 - apt
 - reboot
+```
+
+### Jenkins action
+
+**Requires**: Jenkins credentials (passed as parameters)
+
+The `jenkins` update action can execute a Jenkins job.
+
+| Name                          | Required | Type    | Example                      | Description                                                                                                   |
+| ----------------------------- | -------- | ------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `jenkins.server`              | YES      | String  | `https://my-jenkins-server/` | Jenkins Server URL                                                                                            |
+| `jenkins.username`            | YES      | String  | `username`                   | Jenkins username                                                                                              |
+| `jenkins.password`            | YES      | String  | `password`                   | Jenkins password                                                                                              |
+| `jenkins.job`                 | YES      | String  | `some-important-job`         | Jenkins job to execute                                                                                        |
+| `jenkins.build-arguments`     | YES (*)  | Object  | `{key: value, bool: false}`  | Build jenkins job with parameters. Can be a Jinja template, with access to `{{ host }}` and `{{ host_args }}` |
+| `jenkins.fix-hostname`        | NO       | String  | `{{ host }}.my.domain`       | Jinja template for configuring the host name to use (if any override is needed, e.g. adding domain name)      |
+| `jenkins.wait`                | NO       | Boolean | `true`                       | Whether to wait for the Jenkins job to finish execution                                                       |
+| `jenkins.wait-timeout`        | NO       | Integer | `1000`                       | Timeout after N seconds if Jenkins job has not finished executing                                             |
+| `jenkins.wait-check-interval` | NO       | List    | `10`                         | Check if job has finished every N seconds, until timeout                                                      |
+
+`*` Only when running a job with required parameters.
+
+Example 1: Call a simple Jenkins job and do not wait for execution
+
+```yaml
+updates:
+- jenkins:
+    server: https://production.jenkins.server/
+    username: 'jenkins-user'
+    password: 'a-secure-password-i-just-thought-about'
+    job: 'my-jenkins-job-name'
+    wait: false
+```
+
+Example 2: Call a Jenkins Job with parameters. Wait for job to finish (max 5 minutes).
+
+```yaml
+updates:
+- jenkins:
+    server: https://production.jenkins.server/
+    username: 'jenkins-user'
+    password: 'a-secure-password-i-just-thought-about'
+    job: 'my-jenkins-job-name'
+    build-arguments:
+      host: '{{ host }}'
+    wait: true
+    wait-timeout: 300
+    wait-check-interval: 10
 ```
 
 ### SSH update action

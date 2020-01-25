@@ -1,0 +1,33 @@
+## Amaltheia Job
+## Author: Aggelos Kolaitis
+## Description: Get hosts from API. From dict response, with filter
+
+## Parameters:
+## - "username": Jenkins username
+## - "password": Jenkins API token for user
+
+## Usage 1:
+##  $ amaltheia -s this-file.yaml -v usermame=XXXXXXXX password=XXXXXXXXXX
+
+---
+vars:
+- username
+- password
+config:
+  color: true
+  log-level: debug                      # debug/info/warning/error/fatal
+strategy: serial
+hosts:
+- static:
+  - lar0412.srv-louros.grnet.gr
+  - lar0402.srv-louros.grnet.gr
+services: []
+updates:
+- jenkins:
+    fix-hostname: '{{ host.split(".")[0] }}'
+    server: https://jenkins.tools.grnet.gr
+    username: '{{ username }}'
+    password: '{{ password }}'
+    job: 'lenovo-check-firmware'
+    build-arguments:
+      servers: '{{ host }}'

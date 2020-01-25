@@ -15,6 +15,9 @@
 
 
 from datetime import datetime, timedelta
+from time import sleep
+
+import jenkins
 
 import amaltheia.log as log
 from amaltheia.utils import (
@@ -180,13 +183,136 @@ class ExecUpdater(Updater):
         return True
 
 
+class JenkinsUpdater(Updater):
+    """Post a Jenkins job.
+
+    Required arguments: {
+        "server": "https://jenkins.server/",
+        "username": "jenkins-user",
+        "password": "jenkins-api-key",
+        "job": "job-name",
+    }
+
+    Optional arguments: {
+        "build-arguments": {
+            ...
+        },
+        "wait": True/False,
+        "wait-timeout": 200,
+        "wait-check-interval": 10,
+        "expect-output": "regex-that-can-use-{{ host }}-and-{{ host_args }}"
+    }"""
+    def __init__(self, host_name, host_args, updater_args):
+        super(JenkinsUpdater, self).__init__(host_name, host_args, updater_args)
+        self.wait = self.updater_args.get('wait', True)
+
+        try:
+            self.wait_timeout = int(self.updater_args.get('wait-timeout', 500))
+        except (ValueError, TypeError):
+            log.debug('[jenkins] Default to 200 seconds timeout')
+            self.wait_timeout = 500
+
+        try:
+            self.wait_check_interval = int(
+                self.updater_args.get('wait-check-interval', 10))
+        except (ValueError, TypeError):
+            log.debug('[jenkins] Default to 10 seconds check interval')
+            self.wait_check_interval = 10
+
+        self.server = jinja(self.updater_args.get('server'))
+        self.username = jinja(self.updater_args.get('username'))
+        self.password = jinja(self.updater_args.get('password'))
+        self.job = jinja(self.updater_args.get('job'))
+
+        try:
+            self.jenkins = jenkins.Jenkins(
+                self.server, self.username, self.password)
+        except:
+            log.exception('[{}] [jenkins] Could not connect to {}'.format(
+                self.host, self.server))
+            self.jenkins = None
+
+    def update(self):
+        try:
+            whoami = self.jenkins.get_whoami()
+        except:
+            log.exception('[{}] [jenkins] Failed to authenticate'.format(
+                self.host))
+            return False
+
+        if self.job is None:
+            log.fatal('[{}] [jenkins] Empty job name'.format(self.host))
+            return False
+
+        raw_args = self.updater_args.get('build-arguments')
+        try:
+            if raw_args:
+                queue_id = self.jenkins.build_job(self.job, jinja(
+                    raw_args, host=self.host, host_args=self.host_args))
+            else:
+                queue_id = self.jenkins.build_job(self.job)
+        except:
+            log.exception('[{}] [jenkins] Failed to queue job {}'.format(
+                self.host, self.job))
+            return False
+
+        log.info('[{}] [jenkins] Queued job {} (queue id {})'.format(
+            self.host, self.job, queue_id))
+
+        if not self.wait:
+            return True
+
+        now = datetime.now()
+        timeout = now + timedelta(seconds=self.wait_timeout)
+
+        while True:
+            try:
+                queue_item = self.jenkins.get_queue_item(queue_id)
+                job_number = queue_item['executable']['number']
+                break
+            except KeyError:
+                sleep(self.wait_check_interval)
+                log.debug('[{}] [jenkins] Waiting for job queue {}'.format(
+                    self.host, self.job))
+            except:
+                log.exception('[{}] [jenkins] Failed to queue job {}'.format(
+                    self.host, self.job))
+                return False
+
+            if datetime.now() > timeout:
+                log.fatal('[{}] [jenkins] Timeout waiting for job queue {}'.format(
+                    self.host, self.job))
+                return False
+
+        log.info('[{}] [jenkins] Started job {}/{} (queue id {})'.format(
+            self.host, self.job, job_number, queue_id))
+
+        done = False
+        while not done and datetime.now() <= timeout:
+            log.debug('[{}] [jenkins] Waiting for job run {}/{}'.format(
+                self.host, self.job, job_number))
+            build_info = self.jenkins.get_build_info(self.job, job_number)
+
+            done = build_info['result'] is not None
+            if not done:
+                sleep(self.wait_check_interval)
+
+        if not done:
+            log.fatal('[{}] [jenkins] Timeout waiting for job run {}/{}'.format(
+                self.host, self.job, job_number))
+            return False
+
+        return build_info['result'] == 'SUCCESS'
+
+
 updaters = {
     'dummy': DummyUpdater,
     'apt': AptPackagesUpdater,
     'ssh': SSHCommandUpdater,
     'ssh-touch-file': SSHTouchFileDummyUpdater,
     'reboot': RebootUpdater,
-    'exec': ExecUpdater
+    'exec': ExecUpdater,
+    'jenkins': JenkinsUpdater,
 }
 
 
