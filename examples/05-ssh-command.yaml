@@ -11,7 +11,6 @@
 ---
 config:
   color: true
-  openstack-rc: /path/to/openstack.rc   # openstack credentials rc file
   ssh-user: ubuntu
   ssh-id-rsa-file: /path/to/ssh-id-rsa
   # ssh-id-rsa-password: key-password   # (optional) private key password

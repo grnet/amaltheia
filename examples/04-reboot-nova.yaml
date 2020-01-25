@@ -11,6 +11,7 @@
 ---
 config:
   log-level: info                      # debug/info/warning/error/fatal
+  openstack-rc: /path/to/openstack.rc
   ssh-user: nova
   ssh-id-rsa-file: ./ssh-id-rsa
 strategy:

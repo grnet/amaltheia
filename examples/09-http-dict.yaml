@@ -21,12 +21,6 @@
 ---
 config:
   color: true
-  openstack-rc: /path/to/openstack.rc   # openstack credentials rc file
-  ssh-user: ubuntu
-  ssh-id-rsa-file: /path/to/ssh-id-rsa
-  # ssh-id-rsa-password: key-password   # (optional) private key password
-  ssh-config-file: /path/to/ssh-config  # (optional) ssh-config file
-  ssh-strict-host-key-checking: false
   log-level: debug                      # debug/info/warning/error/fatal
 strategy: serial
 hosts:
