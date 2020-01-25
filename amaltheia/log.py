@@ -24,6 +24,7 @@ class AmaltheiaFormatter(logging.Formatter):
         'DEBUG': 'lightblack_ex',
         'INFO': 'blue',
         'ERROR': 'red',
+        'CRITICAL': 'red',
         'FATAL': 'red',
     }
 
