@@ -78,7 +78,9 @@ class SSHCommandUpdater(Updater):
 
     def update(self):
         if self.command:
-            ssh_cmd(self.host, self.host_args, self.command)
+            command = jinja(
+                self.command, host=self.host, host_args=self.host_args)
+            ssh_cmd(self.host, self.host_args, command)
             return True
 
         return False
