@@ -160,7 +160,9 @@ class HttpDiscoverer(Discoverer):
         self.request.headers = self.request_params.get('headers', {})
         if self.request_params.get('json', {}):
             self.request.headers['content-type'] = 'application/json'
-            self.request.data = json.dumps(self.request_params['json']).encode()
+            self.request.data = json.dumps(jinja(self.request_params['json'])).encode()
+
+        self.request.method = self.request_params.get('method', 'GET')
 
         self.results_template = self.args['results']
         self.host_name_template = self.args['parse']['host-name']
