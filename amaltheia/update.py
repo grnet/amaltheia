@@ -131,6 +131,9 @@ class RebootUpdater(Updater):
     }"""
 
     def __init__(self, host_name, host_args, updater_args):
+        super(RebootUpdater, self).__init__(
+            host_name, host_args, updater_args)
+
         self.wait = self.updater_args.get('wait', True)
 
         try:
