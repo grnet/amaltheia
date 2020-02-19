@@ -247,7 +247,7 @@ def jinja(template, _env=None, **data):
     if _env is None:
         _env = NativeEnvironment(loader=BaseLoader, undefined=DebugUndefined)
 
-    return _env.from_string(str(template)).render(**kwargs)
+    return _env.from_string(str(template)).render(**kwargs, json=json)
 
 
 def GET(url):
