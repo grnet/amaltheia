@@ -173,19 +173,20 @@ class HttpDiscoverer(Discoverer):
 
     def discover(self):
         response = json.loads(urllib.request.urlopen(self.request).read())
-        results = jinja(self.results_template, response=response)
+        results = jinja(self.results_template, _env=None, response=response)
 
         if isinstance(results, dict):
             results = [{'key': k, 'value': v} for k, v in results.items()]
 
         hosts = {}
         for item in results:
-            if any(not re.search(m['regex'], m['value'])
-                   for m in jinja(self.match_filters, item=item)):
+            if any(not re.search(str(m['regex']), str(m['value']))
+                   for m in jinja(self.match_filters, _env=None, item=item)):
                 continue
 
-            host_name = jinja(self.host_name_template, item=item)
-            host_args = jinja(self.host_args_template, item=item)
+            host_name = str(
+                jinja(self.host_name_template, _env=None, item=item))
+            host_args = jinja(self.host_args_template, _env=None, item=item)
 
             hosts[host_name] = host_args
 
