@@ -517,6 +517,40 @@ services:
     skip_restore: true
 ```
 
+
+### Thruk Notifications Service
+
+**Requires: nothing**
+
+The `thruk-downtime` service is used to disable Nagios notifications for a host
+using the Thruk Rest API.
+
+Evacuate Actions:
+* Match the Nagios host using the host address.
+* Disable Nagios notifications for that host
+
+Restore Actions:
+* Re-enable Nagios notifications for the host.
+
+The service parameters are defined below:
+
+| Name                            | Required | Type   | Example                       | Description                                                                                        |
+| ------------------------------- | -------- | ------ | ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| `thruk-downtime.thruk-url`      | YES      | String | `https://nagios:5000/thruk/r` | Thruk API URL                                                                                      |
+| `thruk-downtime.thruk-username` | YES      | String | `thrukadmin`                  | Thruk username                                                                                     |
+| `thruk-downtime.thruk-password` | YES      | String | `supersafepassword`           | Thruk password                                                                                     |
+| `thruk-downtime.fix-hostname`   | NO       | String | `{{ host_args['address'] }}`  | Jinja template for configuring the host name to use (if any override is needed, e.g. setting the ) |
+
+Example:
+
+```yaml
+services:
+- thruk-downtime:
+    thruk-url: 'https://nagios-server:3030/thruk/r'
+    thruk-username: 'thrukadmin'
+    thruk-password': 'asdasd'
+```
+
 ## Command-line arguments
 
 Amaltheia job files are always a single file. However, amaltheia accepts

@@ -18,7 +18,7 @@ import re
 import urllib.request
 
 import amaltheia.log as log
-from amaltheia.utils import GET, jinja, str_or_dict
+from amaltheia.utils import GET, jinja, str_or_dict, _HTTP
 
 
 class Discoverer(object):
@@ -155,14 +155,7 @@ class HttpDiscoverer(Discoverer):
             raise ValueError('missing "parse.host-name" for HTTP discoverer')
 
         self.request_params = self.args.get('request', {})
-        self.request = urllib.request.Request(self.request_params['url'])
-
-        self.request.headers = self.request_params.get('headers', {})
-        if self.request_params.get('json', {}):
-            self.request.headers['content-type'] = 'application/json'
-            self.request.data = json.dumps(jinja(self.request_params['json'])).encode()
-
-        self.request.method = self.request_params.get('method', 'GET')
+        self.request = _HTTP(self.request_params)
 
         self.results_template = self.args['results']
         self.host_name_template = self.args['parse']['host-name']

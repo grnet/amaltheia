@@ -13,12 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import json
 from time import sleep
 from shlex import quote
 
 import amaltheia.log as log
 from amaltheia.utils import (
-    openstack_cmd, openstack_cmd_table, str_or_dict, jinja)
+    openstack_cmd, openstack_cmd_table, str_or_dict, jinja,
+    thruk_get_host, thruk_set_notifications)
 
 
 class Service():
@@ -159,8 +161,61 @@ class NovaComputeService(Service):
         return True
 
 
+class ThrukDowntimeService(Service):
+    """Service handler for thruk-downtime."""
+    @property
+    def name(self):
+        return 'thruk-downtime'
+
+    def __init__(self, host_name, host_args, service_args):
+        super(ThrukDowntimeService, self).__init__(
+            host_name, host_args, service_args)
+
+        self.thruk_url = host_args.get(
+            'thruk-url', service_args.get('thruk-url'))
+        self.thruk_username = host_args.get(
+            'thruk-username', service_args.get('thruk-username'))
+        self.thruk_password = host_args.get(
+            'thruk-password', service_args.get('thruk-password'))
+
+    def evacuate(self):
+        """Use the Thruk Rest API to disable notifications for this host."""
+
+        if self.thruk_url is None:
+            return False
+
+        try:
+            self.nagios_hostname = thruk_get_host(self.thruk_url,
+                                                  self.thruk_username,
+                                                  self.thruk_password,
+                                                  self.host)
+
+        except (json.JSONDecodeError, ValueError, KeyError, TypeError):
+            log.fatal('[{}] Failed to retrieve Nagios name'.format(
+                self.host))
+
+        response = thruk_set_notifications(
+            self.thruk_url, self.thruk_username, self.thruk_password,
+            self.nagios_hostname, False)
+
+        if response.status != 200:
+            log.fatal('[{}] Failed to disable notifications for {}'.format(
+                self.host, self.nagios_hostname))
+
+    def restore(self):
+        """Use the Thruk Rest API to enable notifications for this host"""
+        response = thruk_set_notifications(
+            self.thruk_url, self.thruk_username, self.thruk_password,
+            self.nagios_hostname, True)
+
+        if response.status != 200:
+            log.fatal('[{}] Failed to re-enable notifications for {}'.format(
+                self.host, self.nagios_hostname))
+
+
 services = {
-    'nova-compute': NovaComputeService
+    'nova-compute': NovaComputeService,
+    'thruk-downtime': ThrukDowntimeService,
 }
 
 

@@ -19,6 +19,7 @@ import logging
 import socket
 import subprocess
 import urllib.request
+from base64 import b64encode
 from copy import deepcopy
 
 from jinja2 import BaseLoader, DebugUndefined
@@ -257,6 +258,24 @@ def GET(url):
     return r.read()
 
 
+def _HTTP(request_json):
+    """Returns a urllib.Request object from json data"""
+    r = urllib.request.Request(request_json['url'])
+
+    r.headers = request_json.get('headers', {})
+    if request_json.get('json', {}):
+        r.headers['content-type'] = 'application/json'
+        r.data = json.dumps(jinja(request_json['json'])).encode()
+
+    r.method = request_json.get('method', 'GET')
+    return r
+
+
+def HTTP(request_json):
+    """Perform HTTP request and return response"""
+    return urllib.request.urlopen(_HTTP(request_json))
+
+
 def override(dictionary, key, value):
     """Override dictionary variables. Key name can have `.` for multiple
     levels. Updates @dictionary in place.
@@ -277,3 +296,36 @@ def override(dictionary, key, value):
             dictionary[key] = {}
 
         override(dictionary[key], rest, value)
+
+
+def thruk_get_host(thruk_url, thruk_username, thruk_password, address):
+    """Get Nagios hostname from Thruk API using address. Raise exception
+    on error"""
+    r = HTTP({
+        'url': '{}/hosts?address={}'.format(thruk_url, address),
+        'headers': {
+            'Authentication': 'Basic {}'.format(
+                b64encode('{}:{}'.format(thruk_username, thruk_password) \
+                                 .encode()).decode())
+        },
+        'method': 'GET',
+    })
+
+    return json.dumps(r.read())['name']
+
+
+def thruk_set_notifications(thruk_url, thruk_username, thruk_password, name, enable):
+    """Set notifications on or off for Nagios host. Raise exception on error.
+    Returns True/False"""
+    r = HTTP({
+        'url': '{}/hosts/{}/{}_notifications'.format(
+            thruk_url, name, 'enable' if enable else 'disable'),
+        'headers': {
+            'Authentication': 'Basic {}'.format(
+                b64encode('{}:{}'.format(thruk_username, thruk_password) \
+                                 .encode()).decode())
+        },
+        'method': 'POST',
+    })
+
+    return r
