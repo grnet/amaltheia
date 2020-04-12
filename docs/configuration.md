@@ -145,6 +145,8 @@ each of these conditions. The complete format is:
 | `patchman.on-package-updates` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that have available package updates                                                           |
 | `patchman.on-reboot-required` | NO       | List of actions | ``                                             | List of update actions to perform on the servers that require a reboot                                                                         |
 | `patchman.skip-ok`            | NO       | Boolean         | `false`                                        | If `true`, then hosts that require no updates and/or reboot will not be added in the list                                                      |
+| `patchman.http_proxy`         | NO       | String          | `http://example.com:8000`                      | Sets `http_proxy` for patchman report uploading                                                    |
+| `patchman.https_proxy`        | NO       | String          | `http://example.com:8000`                      | Sets `https_proxy` for patchman report uploading                                                    |
 
 Example 1: This example queries the Patchman server for hosts whose names match
 the filter `lar04..` ("lar04" and two more characters). It adds an `apt` action

@@ -114,9 +114,18 @@ class AptPackagesUpdater(Updater):
                 return False
 
         patchman_url = self.updater_args.get('patchman-url')
+        if patchman_url.startswith('https'):
+            https_proxy = self.updater_args.get('https_proxy')
+            proxy_prefix = 'export https_proxy={}; '.format(
+                https_proxy) if https_proxy else ''
+        else:
+            http_proxy = self.updater_args.get('http_proxy')
+            proxy_prefix = 'export http_proxy={}; '.format(
+                http_proxy) if http_proxy else ''
         if patchman_url is not None:
             ssh_cmd(self.host, self.host_args,
-                    'sudo patchman-client -s {}'.format(patchman_url))
+                    '{}sudo patchman-client -s {}'.format(
+                        proxy_prefix, patchman_url))
 
         return True
 
