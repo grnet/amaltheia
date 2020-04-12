@@ -208,7 +208,8 @@ class JenkinsUpdater(Updater):
         "expect-output": "regex-that-can-use-{{ host }}-and-{{ host_args }}"
     }"""
     def __init__(self, host_name, host_args, updater_args):
-        super(JenkinsUpdater, self).__init__(host_name, host_args, updater_args)
+        super(JenkinsUpdater, self).__init__(
+            host_name, host_args, updater_args)
         self.wait = self.updater_args.get('wait', True)
 
         try:
@@ -239,7 +240,7 @@ class JenkinsUpdater(Updater):
 
     def update(self):
         try:
-            whoami = self.jenkins.get_whoami()
+            self.jenkins.get_whoami()
         except:
             log.exception('[{}] [jenkins] Failed to authenticate'.format(
                 self.host))
@@ -285,8 +286,9 @@ class JenkinsUpdater(Updater):
                 return False
 
             if datetime.now() > timeout:
-                log.fatal('[{}] [jenkins] Timeout waiting for job queue {}'.format(
-                    self.host, self.job))
+                log.fatal(
+                    '[{}] [jenkins] Timeout waiting for job queue {}'.format(
+                        self.host, self.job))
                 return False
 
         log.info('[{}] [jenkins] Started job {}/{} (queue id {})'.format(
@@ -303,8 +305,9 @@ class JenkinsUpdater(Updater):
                 sleep(self.wait_check_interval)
 
         if not done:
-            log.fatal('[{}] [jenkins] Timeout waiting for job run {}/{}'.format(
-                self.host, self.job, job_number))
+            log.fatal(
+                '[{}] [jenkins] Timeout waiting for job run {}/{}'.format(
+                    self.host, self.job, job_number))
             return False
 
         return build_info['result'] == 'SUCCESS'

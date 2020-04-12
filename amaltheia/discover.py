@@ -163,7 +163,6 @@ class HttpDiscoverer(Discoverer):
 
         self.match_filters = self.args.get('match', [])
 
-
     def discover(self):
         response = json.loads(urllib.request.urlopen(self.request).read())
         results = jinja(self.results_template, _env=None, response=response)

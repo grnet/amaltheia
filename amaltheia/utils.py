@@ -305,8 +305,8 @@ def thruk_get_host(thruk_url, thruk_username, thruk_password, address):
         'url': '{}/hosts?address={}'.format(thruk_url, address),
         'headers': {
             'Authentication': 'Basic {}'.format(
-                b64encode('{}:{}'.format(thruk_username, thruk_password) \
-                                 .encode()).decode())
+                b64encode('{}:{}'.format(
+                    thruk_username, thruk_password).encode()).decode())
         },
         'method': 'GET',
     })
@@ -314,7 +314,8 @@ def thruk_get_host(thruk_url, thruk_username, thruk_password, address):
     return json.dumps(r.read())['name']
 
 
-def thruk_set_notifications(thruk_url, thruk_username, thruk_password, name, enable):
+def thruk_set_notifications(thruk_url, thruk_username, thruk_password, name,
+                            enable):
     """Set notifications on or off for Nagios host. Raise exception on error.
     Returns True/False"""
     r = HTTP({
@@ -322,8 +323,8 @@ def thruk_set_notifications(thruk_url, thruk_username, thruk_password, name, ena
             thruk_url, name, 'enable' if enable else 'disable'),
         'headers': {
             'Authentication': 'Basic {}'.format(
-                b64encode('{}:{}'.format(thruk_username, thruk_password) \
-                                 .encode()).decode())
+                b64encode('{}:{}'.format(
+                    thruk_username, thruk_password).encode()).decode())
         },
         'method': 'POST',
     })
