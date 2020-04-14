@@ -124,7 +124,7 @@ class AptPackagesUpdater(Updater):
                 http_proxy) if http_proxy else ''
         if patchman_url is not None:
             ssh_cmd(self.host, self.host_args,
-                    '{}sudo patchman-client -s {}'.format(
+                    '{}sudo -E patchman-client -s {}'.format(
                         proxy_prefix, patchman_url))
 
         return True
