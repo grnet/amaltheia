@@ -95,10 +95,14 @@ class AptPackagesUpdater(Updater):
     }"""
 
     def update(self):
+        with_new_pkgs_flag = jinja(self.updater_args.get('withnewpkgs', False))
+        with_new_pkgs = '--with-new-pkgs' if with_newpkgs_flag else ''
+
         stdout, stderr = ssh_cmd(
             self.host, self.host_args,
             'sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q'
-            ' -o Dpkg::Options::=--force-confold upgrade;')
+            ' -o Dpkg::Options::=--force-confold {} upgrade;'.format(
+                with_new_pkgs))
 
         if stderr != "":
             return False
