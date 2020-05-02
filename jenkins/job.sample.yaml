@@ -15,7 +15,7 @@
 ##  $ amaltheia -s this-file.yaml -v filter="FILTER" autoremove=false
 
 ## Usage 3 (to install new packages):
-##  $ amaltheia -s this-file.yaml -v filter="FILTER" withnewpkgs="1"
+##  $ amaltheia -s this-file.yaml -v filter="FILTER" withnewpkgs=true
 
 ---
 required:
@@ -35,7 +35,7 @@ hosts:
     on-package-updates:
     - apt:
         autoremove: '{{ autoremove }}'
-        withnewpkgs: '{{ withnewpkgs }}'
+        with-new-pkgs: '{{ withnewpkgs }}'
         patchman-url: https://YOUR-PATCHMAN-SERVER/
 services: []
 updates: []

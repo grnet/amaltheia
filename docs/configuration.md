@@ -312,13 +312,13 @@ The `apt` update action performs system package updates on a host. It makes
 sure that the process will not be stuck on interactive prompts. The options
 for this action are described below:
 
-| Name               | Required | Type    | Example                | Description                                                                                              |
-| ------------------ | -------- | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------- |
-| `apt.autoremove`   | NO       | Boolean | `true`                 | Run `apt-get autoremove` after performing upgrades                                                       |
-| `apt.hold`         | NO       | List    | `[apt, vim]`           | `apt-mark hold` a list of packages **before** updating                                                   |
-| `apt.unhold`       | NO       | List    | `[apt, vim]`           | `apt-mark unhold` a list of packages **after** updating                                                  |
-| `apt.fix-hostname` | NO       | String  | `{{ host }}.my.domain` | Jinja template for configuring the host name to use (if any override is needed, e.g. adding domain name) |
-| `apt.withnewpkgs`  | NO       | Boolean | `true`                 | Run `apt-get upgrade --with-new-pkgs`                                                                    |
+| Name                 | Required | Type    | Example                | Description                                                                                              |
+| -------------------- | -------- | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `apt.autoremove`     | NO       | Boolean | `true`                 | Run `apt-get autoremove` after performing upgrades                                                       |
+| `apt.hold`           | NO       | List    | `[apt, vim]`           | `apt-mark hold` a list of packages **before** updating                                                   |
+| `apt.unhold`         | NO       | List    | `[apt, vim]`           | `apt-mark unhold` a list of packages **after** updating                                                  |
+| `apt.fix-hostname`   | NO       | String  | `{{ host }}.my.domain` | Jinja template for configuring the host name to use (if any override is needed, e.g. adding domain name) |
+| `apt.with-new-pkgs`  | NO       | Boolean | `true`                 | Run `apt-get upgrade --with-new-pkgs`                                                                    |
 
 Example: This action will perform any system updates available. It will also
 autoremove old packages afterwards. However, it will hold the versions for the
