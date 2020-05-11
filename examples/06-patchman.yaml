@@ -6,12 +6,16 @@
 ## - filter       Only perform updates for machines whose names match
 ##                the filter
 ## - autoremove   Set to non-empty value to also autoremove old packages
+## - withnewpkgs  Set to non-empty value to also install new packages
 
 ## Usage 1 (to autoremove packages):
-##  $ amaltheia -s this-file.yaml -v autoremove="1"
+##  $ amaltheia -s this-file.yaml -v autoremove=true
 
-## Usage 2 (without autoremove)
+## Usage 2 (without autoremove):
 ##  $ amaltheia -s this-file.yaml -v filter="FILTER" autoremove=false
+
+## Usage 3 (to install new packages):
+##  $ amaltheia -s this-file.yaml -v filter="FILTER" withnewpkgs=true
 
 ---
 required:
@@ -31,6 +35,7 @@ hosts:
     on-package-updates:
     - apt:
         autoremove: '{{ autoremove }}'
+        with-new-pkgs: '{{ withnewpkgs }}'
         patchman-url: https://YOUR-PATCHMAN-SERVER/
 services: []
 updates: []

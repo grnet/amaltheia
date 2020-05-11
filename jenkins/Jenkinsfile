@@ -10,11 +10,7 @@ pipeline {
       stage('Perform system updates with amaltheia') {
       steps {
         script {
-          if (autoremove == 'true') {
-            sh 'docker run --rm amaltheia-jenkins-image -s /job.yaml -v filter="${filter}" autoremove=1'
-          } else {
-            sh 'docker run --rm amaltheia-jenkins-image -s /job.yaml -v filter="${filter}"'
-          }
+          sh 'docker run --rm amaltheia-jenkins-image -s /job.yaml -v filter="${filter}" autoremove="${autoremove}" withnewpkgs="${withnewpkgs}"'
         }
       }
     }
