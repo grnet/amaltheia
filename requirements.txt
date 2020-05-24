@@ -3,3 +3,4 @@ python-openstackclient
 colorama
 jinja2
 python-jenkins
+jsonpath-ng

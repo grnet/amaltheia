@@ -581,7 +581,12 @@ You can override the log level when executing the job with:
 $ python3 amaltheia/amaltheia.py -s job.yaml -o config.log_level=debug
 ```
 
-As can be seen from the example below, use dots (`.`) to access child names.
+As can be seen from the example below, use dots (`.`) to access child names. In
+fact, you can use any valid jsonpath expression:
+
+```bash
+$ python3 amaltheia/amaltheia.py -s job.yaml -o hosts[0].static[0]=myhost.changed.domain.ext
+```
 
 **NOTE**: The format for overriding configuration is `-o key=value` The `value`
 will be tread as YAML input, which means that you can even use lists or

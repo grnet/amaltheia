@@ -15,6 +15,7 @@
 
 
 import json
+import jsonpath_ng
 import logging
 import socket
 import subprocess
@@ -278,7 +279,7 @@ def HTTP(request_json):
 
 def override(dictionary, key, value):
     """Override dictionary variables. Key name can have `.` for multiple
-    levels. Updates @dictionary in place.
+    levels, and `[index]` to change lists. Updates @dictionary in place.
     Example:
 
     ```
@@ -287,15 +288,7 @@ def override(dictionary, key, value):
     assert d == {'a': 1, 'c': {'d': 10}}
     ```
     """
-    if '.' not in key:
-        dictionary[key] = value
-
-    else:
-        key, rest = key.split('.', 1)
-        if not isinstance(dictionary.get(key), dict):
-            dictionary[key] = {}
-
-        override(dictionary[key], rest, value)
+    dictionary = jsonpath_ng.parse(key).update(dictionary, value)
 
 
 def thruk_get_host(thruk_url, thruk_username, thruk_password, address):
