@@ -1,7 +1,14 @@
-FROM python:3
+FROM python:3-alpine
+MAINTAINER Aggelos Kolaitis "akolaitis@admin.grnet.gr"
 
-ARG branch=master
-RUN pip install git+https://github.com/grnet/amaltheia@$branch --no-cache
-WORKDIR /amaltheia
+ARG BRANCH=master
 
-ENTRYPOINT ["amaltheia"]
+RUN apk --no-cache add --virtual .build-deps --update \
+        git \
+        gcc \
+        make \
+        libffi-dev \
+        openssl-dev \
+        musl-dev && \
+    pip3 install --no-cache-dir git+git://github.com/grnet/amaltheia.git@$BRANCH && \
+    apk del .build-deps
